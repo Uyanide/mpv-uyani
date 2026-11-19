@@ -6,11 +6,11 @@
 
 ## 特性
 
-- uosc (基本是默认配置)
-- uosc_danmaku (弹幕插件)
-- thumbfast (进度条缩略图)
-- anime4k (唯一的着色器, 支持且仅支持 Fast/HQ 档位切换)
-- hold_speed.lua (长按倍速)
+- [uosc](https://github.com/tomasklaen/uosc) - UI; 基本是默认配置
+- [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku) - 弹幕插件
+- [thumbfast](https://github.com/po5/thumbfast) - 进度条缩略图
+- [anime4k](https://github.com/bloc97/Anime4K) - 唯一的着色器, 支持且仅支持 Mode A Fast/HQ 档位切换
+- hold_speed.lua - 长按倍速; 本仓库脚本
 
 其余功能均为 mpv 内置 (如: 播放历史 / yt-dlp / 截图 / high-quality 画质 etc.).
 
@@ -18,11 +18,11 @@
 
 - Jellyfin
 
-  由 jellify-mpv-shim 配置 mpv_ext 拉起 mpv, mpv 侧无需额外配置.
+  由 [jellify-mpv-shim](https://github.com/jellyfin/jellyfin-mpv-shim) 配置 mpv_ext 拉起 mpv, mpv 侧无需额外配置.
 
 - HDR / Dolby Vision
 
-  我很少接触此类片源, 且显示器配置一般, 能力有限.
+  我很少接触此类片源, 且显示器配置一般, 增效有限.
 
 - WebDAV / Samba
 
@@ -39,8 +39,9 @@
 ## 部署
 
 ```bash
+# 假设仓库目标位置为 ~/Projects/mpv-uyani
 git clone --recurse-submodules https://github.com/Uyanide/mpv-uyani.git ~/Projects/mpv-uyani
-# 若目标位置已存在则失败; 记得先备份喵
+# 若配置目录已存在则失败; 记得先备份喵
 ! [ -e ~/.config/mpv ] && ln -sfn ../Projects/mpv-uyani ~/.config/mpv
 ```
 
