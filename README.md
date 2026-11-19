@@ -2,6 +2,8 @@
 
 极度精简和实用主义的个人 mpv 配置. 外部依赖见 [DEPENDENCIES.md](DEPENDENCIES.md).
 
+适配 macOS 与 Linux.
+
 ## 特性
 
 - uosc (基本是默认配置)
@@ -11,6 +13,28 @@
 - hold_speed.lua (长按倍速)
 
 其余功能均为 mpv 内置 (如: 播放历史 / yt-dlp / 截图 / high-quality 画质 etc.).
+
+### 为什么没有…
+
+- Jellyfin
+
+  由 jellify-mpv-shim 配置 mpv_ext 拉起 mpv, mpv 侧无需额外配置.
+
+- HDR / Dolby Vision
+
+  我很少接触此类片源, 且显示器配置一般, 能力有限.
+
+- WebDAV / Samba
+
+  通过文件系统挂载, mpv 侧无需额外配置.
+
+- 在线字幕 / AI 字幕 / 自动字幕同步
+
+  配置繁琐且效果一般.
+
+- 其他所有
+
+  我不用🤗
 
 ## 部署
 
@@ -68,4 +92,4 @@ tools/verify.sh
 - 避免在 `fonts/` 里放任何适合系统全局安装的字体 (e.g. Noto Sans CJK).
 - 避免在配置文件中重复设置默认值.
 - 通过 git submodule 和符号链接管理外部来源的文件; 违例需额外注明出处.
-- 同类功能仅保留一份实现, 并移除或禁用其他实现 (e.g. 播放历史);
+- 同类功能仅保留一份实现, 并移除或禁用其他实现 (e.g. 播放历史).
