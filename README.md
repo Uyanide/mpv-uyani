@@ -15,9 +15,9 @@
 ## 部署
 
 ```bash
-git clone --recurse-submodules https://github.com/Uyanide/mpv-uyani.git ~/Repositories/mpv-uyani
+git clone --recurse-submodules https://github.com/Uyanide/mpv-uyani.git ~/Projects/mpv-uyani
 # 若目标位置已存在则失败; 记得先备份喵
-! [ -e ~/.config/mpv ] && ln -srfn ~/Repositories/mpv-uyani ~/.config/mpv
+! [ -e ~/.config/mpv ] && ln -sfn ../Projects/mpv-uyani ~/.config/mpv
 ```
 
 ## 插件管理

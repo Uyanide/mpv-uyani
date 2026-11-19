@@ -96,10 +96,10 @@ expect scripts "$out" 'script-loaded/uosc=yes' 'script-loaded/uosc_danmaku=yes' 
 
 # 核心播放
 out=$(probe "$MEDIA/h264_1080.mkv")
-expect local-1080p "$out" 'hwdec-current=vulkan|nvdec' 'demuxer-readahead-secs=1\.0+'
+expect local-1080p "$out" 'hwdec-current=vulkan|nvdec|videotoolbox' 'demuxer-readahead-secs=1\.0+'
 
 out=$(probe "$MEDIA/vp9_10bit.webm")
-expect vp9-10bit "$out" 'hwdec-current=vulkan|nvdec'
+expect vp9-10bit "$out" 'hwdec-current=vulkan|nvdec|videotoolbox'
 
 out=$(probe --vf=fps=60/1.001 "$MEDIA/h264_1080.mkv")   # 模拟 uosc_danmaku 的 vf_fps
 expect danmaku-fps-vf "$out" 'vf=.*fps.*' 'hwdec-current=.+'
@@ -112,9 +112,13 @@ out=$(probe "http://127.0.0.1:$port/h264_1080.mkv")
 kill "$srv"
 expect http-stream "$out" 'demuxer-readahead-secs=120\.0+' 'demuxer-max-bytes=1073741824|1\.0+ GiB'
 
-# Smooth Motion 的命令行参数 (除环境变量外)
-out=$(probe --video-sync=audio --interpolation=no --hwdec=nvdec-copy "$MEDIA/h264_1080.mkv")
-expect mpv-sm-args "$out" 'hwdec-current=nvdec-copy' 'interpolation=no' 'glsl-shaders='
+# Smooth Motion 的命令行参数 (除环境变量外); 只有 Linux + N 卡才有
+if [ "$(uname)" = Linux ]; then
+    out=$(probe --video-sync=audio --interpolation=no --hwdec=nvdec-copy "$MEDIA/h264_1080.mkv")
+    expect mpv-sm-args "$out" 'hwdec-current=nvdec-copy' 'interpolation=no' 'glsl-shaders='
+else
+    printf 'skip  %-22s 非 Linux\n' mpv-sm-args
+fi
 
 # 画质
 out=$(probe "$MEDIA/h264_1080.mkv")
@@ -172,8 +176,9 @@ out=$(probe --script-opts-append='probe-keys=MBTN_RIGHT' \
 expect menu-open "$out" 'after1-expand=menu\|[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}'
 
 # 右键菜单的结构, 以及菜单和控制栏引用的 uosc / uosc_danmaku 命令是否存在 (防止 submodule 更新后改名)
-menu=$(sed -n 's/^\([^ ]*\) \+\([^#]*\)#! *\(.*\)$/\2\t\3/p' "$REPO/input.conf")
-top=$(printf '%s\n' "$menu" | cut -f2 | sed 's/ *>.*//' | awk '!seen[$0]++' | paste -sd,)
+tab=$(printf '\t')
+menu=$(sed -n "s/^\([^ ]*\)  *\([^#]*\)#! *\(.*\)\$/\2$tab\3/p" "$REPO/input.conf")
+top=$(printf '%s\n' "$menu" | cut -f2 | sed 's/ *>.*//' | awk '!seen[$0]++' | paste -sd, -)
 expect menu-structure "top=$top" 'top=打开,轨道,画面,弹幕,工具,退出'
 missing=
 for b in $(printf '%s\n' "$menu" | grep -o 'script-binding uosc/[a-z-]*' | sed 's|.*/||'); do
