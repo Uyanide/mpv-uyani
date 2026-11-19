@@ -1,0 +1,15 @@
+[submodule "vendor/uosc"]
+	path = vendor/uosc
+	url = https://github.com/tomasklaen/uosc
+	branch = main
+	shallow = true
+[submodule "vendor/uosc_danmaku"]
+	path = vendor/uosc_danmaku
+	url = https://github.com/Tony15246/uosc_danmaku
+	branch = main
+	shallow = true
+[submodule "vendor/thumbfast"]
+	path = vendor/thumbfast
+	url = https://github.com/po5/thumbfast
+	branch = master
+	shallow = true
