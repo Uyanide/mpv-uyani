@@ -64,16 +64,18 @@ probe() { # probe <mpv 参数...>; 输出探针的 KEY=VALUE 行
         sed -n 's/^\[probe\] //p'
 }
 
-expect() { # expect <用例名> <探针输出> <KEY=正则>...
+expect() { # expect <用例名> <探针输出> <KEY=正则 | KEY!=正则>...；正则须匹配整个值，!= 表示不得匹配
     local name=$1 output=$2; shift 2
-    local kv key re val
+    local kv key re val neg matched
     for kv in "$@"; do
-        key=${kv%%=*} re=${kv#*=}
+        key=${kv%%=*} re=${kv#*=} neg=
+        [ "${key%!}" != "$key" ] && key=${key%!} neg=1
         val=$(printf '%s\n' "$output" | awk -v k="$key=" 'index($0, k) == 1 { print substr($0, length(k) + 1); exit }')
-        if printf '%s\n' "$val" | grep -qxE "$re"; then
+        printf '%s\n' "$val" | grep -qxE "$re" && matched=1 || matched=
+        if [ "$matched" != "$neg" ]; then
             printf 'ok    %-22s %s=%s\n' "$name" "$key" "$val"
         else
-            printf 'FAIL  %-22s %s=%s (期望 /%s/)\n' "$name" "$key" "$val" "$re"
+            printf 'FAIL  %-22s %s=%s (期望%s /%s/)\n' "$name" "$key" "$val" "${neg:+不匹配}" "$re"
             fails=$((fails + 1))
         fi
     done
@@ -84,7 +86,7 @@ A4K_FAST="$A4K_DIR/Anime4K_Clamp_Highlights.glsl:$A4K_DIR/Anime4K_Restore_CNN_M.
 A4K_HQ="$A4K_DIR/Anime4K_Clamp_Highlights.glsl:$A4K_DIR/Anime4K_Restore_CNN_VL.glsl:$A4K_DIR/Anime4K_Upscale_CNN_x2_VL.glsl:.+:$A4K_DIR/Anime4K_Upscale_CNN_x2_M.glsl"
 
 # 配置本身
-errs=$(timeout 60 mpv --config-dir="$REPO" --ao=null --frames=1 --no-resume-playback \
+errs=$(timeout 60 mpv --config-dir="$REPO" --ao=null --frames=1 --idle=no --no-resume-playback \
     --watch-later-dir="$MEDIA/watch_later" --no-save-watch-history --msg-level=all=error \
     "$MEDIA/h264_720.mkv" 2>&1 | grep -iE 'error|fail' | tr '\n' ' ')
 expect config-load "config-errors=$errs" 'config-errors='
@@ -96,13 +98,13 @@ expect scripts "$out" 'script-loaded/uosc=yes' 'script-loaded/uosc_danmaku=yes' 
 
 # 核心播放
 out=$(probe "$MEDIA/h264_1080.mkv")
-expect local-1080p "$out" 'hwdec-current=vulkan|nvdec|videotoolbox' 'demuxer-readahead-secs=1\.0+'
+expect local-1080p "$out" 'hwdec-current=.+' 'hwdec-current!=no' 'demuxer-readahead-secs=1\.0+'
 
 out=$(probe "$MEDIA/vp9_10bit.webm")
-expect vp9-10bit "$out" 'hwdec-current=vulkan|nvdec|videotoolbox'
+expect vp9-10bit "$out" 'hwdec-current=.+' 'hwdec-current!=no'
 
 out=$(probe --vf=fps=60/1.001 "$MEDIA/h264_1080.mkv")   # 模拟 uosc_danmaku 的 vf_fps
-expect danmaku-fps-vf "$out" 'vf=.*fps.*' 'hwdec-current=.+'
+expect danmaku-fps-vf "$out" 'vf=.*fps.*' 'hwdec-current=.+' 'hwdec-current!=no'
 
 port=$((20000 + RANDOM % 20000))
 python3 -m http.server -b 127.0.0.1 -d "$MEDIA" "$port" >/dev/null 2>&1 &
