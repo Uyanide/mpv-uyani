@@ -18,11 +18,11 @@
 
 - Jellyfin
 
-  由 [jellify-mpv-shim](https://github.com/jellyfin/jellyfin-mpv-shim) 配置 mpv_ext 拉起 mpv, mpv 侧无需额外配置.
+  由 [jellyfin-mpv-shim](https://github.com/jellyfin/jellyfin-mpv-shim) 配置 mpv_ext 拉起 mpv, mpv 侧无需额外配置.
 
 - HDR / Dolby Vision
 
-  我很少接触此类片源, 且显示器配置一般, 增效有限.
+  我很少接触此类片源, 且显示器配置一般, 收益有限.
 
 - WebDAV / Samba
 
