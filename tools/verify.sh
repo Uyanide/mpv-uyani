@@ -214,6 +214,14 @@ expect misc-keys "$out" 'after1-expand=105\|.*' 'after3-expand=95\|.*' 'after4-e
     'binding/WHEEL_UP=no-osd add volume  10;.*' 'binding/WHEEL_DOWN=no-osd add volume -10;.*' \
     'binding/Ctrl+D=.*open_add_total_menu' 'binding/Alt+d=.*open_search_danmaku_menu' 'binding/~=script-binding console/enable'
 
+# 字幕 / 弹幕延迟. 弹幕延迟的命令不能带 ${=time-pos}, 否则只移动当前位置之后的弹幕, 屏幕上的不动
+out=$(probe --pause --script-opts-append='probe-keys=x y y Alt+x Alt+y Alt+y' \
+    --script-opts-append='probe-expand=${=sub-delay}|${user-data/uosc_danmaku/danmaku-delay}' \
+    --script-opts-append='probe-bindings=Alt+x Alt+y' "$MEDIA/lang.mkv")
+expect delay-keys "$out" 'after1-expand=0\.10*\|0(\.0+)?' 'after3-expand=[-]0\.10*\|0(\.0+)?' \
+    'after4-expand=[-]0\.10*\|1(\.0+)?' 'after6-expand=[-]0\.10*\|-1(\.0+)?' \
+    'binding/Alt+x=script-message danmaku-delay 1' 'binding/Alt+y=script-message danmaku-delay -1'
+
 out=$(probe --pause --script-opts-append='probe-keys=Shift+UP Shift+DOWN' \
     --script-opts-append='probe-expand=${=time-pos}' "$MEDIA/long/long.mkv")
 expect seek-85 "$out" 'after1-expand=85(\.0+)?' 'after2-expand=0(\.0+)?'
